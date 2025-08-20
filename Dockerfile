@@ -11,7 +11,7 @@ COPY . .
 RUN chmod +x mvnw
 
 # Build the project and skip tests
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # ===== Run Stage =====
 FROM openjdk:11-jre-slim
