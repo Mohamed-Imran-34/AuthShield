@@ -19,6 +19,6 @@ public class securityService  implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         users user = userTableRepository.findById(username).orElse(null);
 
-        return User.builder().username(user.getEmail()).password(user.getPassword()).roles("user").build();
+        return User.builder().username(user.getEmail()).password(user.getPassword()).roles(user.getRole()).build();
     }
 }

@@ -4,11 +4,10 @@ package com.security.AuthShield.service;
 import com.security.AuthShield.jwtservice.jwtUtils;
 import com.security.AuthShield.mailService.mailServices;
 import com.security.AuthShield.model.*;
+import com.security.AuthShield.repository.userLogRepository;
 import com.security.AuthShield.repository.userTableRepository;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -32,11 +31,15 @@ public class appService {
 
     @Autowired
     private mailServices mailServices;
+
     @Autowired
     private AuthenticationProvider authenticationProvider;
 
     @Autowired
     private jwtUtils jwtUtils ;
+
+    @Autowired
+    private userLogRepository userLogRepository;
 
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
@@ -52,11 +55,17 @@ public class appService {
                 .resetOtp(null)
                 .verifyExpiration(null)
                 .resetExpiration(null)
+                .role("user")
                 .build();
 
+        usersLog userslog = usersLog.builder()
+                .email(request.getEmail())
+                .username(request.getUsername())
+                .info("Created")
+                .build();
         if(! userTableRepository.existsById(request.getEmail())){
             userTableRepository.save(user);
-            userResponse userResponse = new userResponse(request.getUsername(),request.getEmail(),user.getIsAccountVerified());
+            userLogRepository.save(userslog);
             return new ResponseEntity<>("Successfully created", HttpStatus.CREATED);
         }
         else{
@@ -73,7 +82,7 @@ public class appService {
             HttpHeaders headers= new HttpHeaders();
             headers.add(HttpHeaders.SET_COOKIE,cookie.toString());
             users user=userTableRepository.findById(userLogin.getEmail()).orElse(null);
-            return  new ResponseEntity<>( new userResponse(user.getUsername(),user.getEmail(),user.getIsAccountVerified()),headers,HttpStatus.OK);
+            return  new ResponseEntity<>( new userResponse(user.getUsername(),user.getEmail(),user.getIsAccountVerified(),"admin".equals(user.getRole())),headers,HttpStatus.OK);
         }
         catch (BadCredentialsException e){
             return  new ResponseEntity<>("Invalid Credentials",HttpStatus.UNAUTHORIZED);
@@ -209,9 +218,30 @@ public class appService {
         String name=SecurityContextHolder.getContext().getAuthentication().getName();
         users user = userTableRepository.findById(name).orElse(null);
         if(user != null) {
-            userResponse userResponse = new userResponse(user.getUsername(),user.getEmail(),user.getIsAccountVerified());
+            userResponse userResponse = new userResponse(user.getUsername(),user.getEmail(),user.getIsAccountVerified(),"admin".equals(user.getRole()));
             return  new ResponseEntity<>(userResponse,HttpStatus.OK);
         }
         return new ResponseEntity<>("Invalid request",HttpStatus.UNAUTHORIZED);
+    }
+
+    public ResponseEntity<?> deleteAccount(String email) {
+
+        users  user = userTableRepository.findById(email).orElse(null);
+        usersLog userslog =usersLog.builder()
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .info("Deleted ")
+                .build();
+
+        try{
+            userTableRepository.deleteById(email);
+            userLogRepository.save(userslog);
+            ResponseCookie cookie = ResponseCookie.from("JWTKEY","").path("/").sameSite("Strict").maxAge(0).httpOnly(true).secure(false).build();
+            HttpHeaders headers=new HttpHeaders();
+            headers.add(HttpHeaders.SET_COOKIE,cookie.toString());
+            return new ResponseEntity<>("Deleted successfully",headers,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to delete",HttpStatus.NOT_ACCEPTABLE);
+        }
     }
 }

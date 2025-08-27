@@ -31,7 +31,7 @@ public class securityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(requests->requests.requestMatchers("/authShield/v1/register","/authShield/v1/login","/authShield/v1/resetOtp","/authShield/v1/verifyResetOtp","/authShield/v1/reset/accountPassword","/","/login","/resetpassword","/verifyotp","/dashboard","/static/**","/index.html","/manifest.json","/assets/**").permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(requests->requests.requestMatchers("/adminpanel","/authShield/v1/admin/**").hasRole("admin").requestMatchers("/authShield/v1/register","/authShield/v1/login","/authShield/v1/resetOtp","/authShield/v1/verifyResetOtp","/authShield/v1/reset/accountPassword","/","/login","/resetpassword","/dashboard","/static/**","/index.html","/manifest.json","/assets/**").permitAll().anyRequest().authenticated())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .logout(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtFilterChain, UsernamePasswordAuthenticationFilter.class)

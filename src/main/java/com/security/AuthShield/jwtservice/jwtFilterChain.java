@@ -33,7 +33,7 @@ public class jwtFilterChain extends OncePerRequestFilter {
         String token=null;
         User user=null;
         String username=null;
-        final List<String> paths= new ArrayList<>(Arrays.asList("/authShield/v1/register","/authShield/v1/login","/authShield/v1/resetOtp","/authShield/v1/verifyResetOtp","/authShield/v1/reset/accountPassword","/","/login","/resetpassword","/verifyotp","/dashboard"));
+        final List<String> paths= new ArrayList<>(Arrays.asList("/authShield/v1/register","/authShield/v1/login","/authShield/v1/resetOtp","/authShield/v1/verifyResetOtp","/authShield/v1/reset/accountPassword","/","/login","/resetpassword","/dashboard"));
         String path =request.getServletPath();
         if(paths.contains(path)){
             filterChain.doFilter(request,response);

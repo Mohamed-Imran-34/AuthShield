@@ -63,4 +63,10 @@ public class appController {
         return service.profileDetails();
     }
 
+    @PostMapping("/removeAccount")
+    public ResponseEntity<?> deleteAccount(){
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.deleteAccount(email);
+    }
+
 }

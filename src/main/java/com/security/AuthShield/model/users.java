@@ -30,6 +30,7 @@ public class users {
     private String verifyOtp;
     private Date resetExpiration;
     private Date verifyExpiration;
+    private String role;
 
     @CurrentTimestamp
     @Column(updatable = false)
