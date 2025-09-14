@@ -167,7 +167,6 @@ public class appService {
             userTableRepository.save(user);
             return new ResponseEntity<>("Otp sent successfully",HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println(e);
             return  new ResponseEntity<>("Email doesn't sent ! tryAgain"+e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
