@@ -46,7 +46,7 @@ public class mailServices {
         sendSmtpEmail.setSender(new SendSmtpEmailSender().email("a1b2c3d4w7x8y9z0@gmail.com").name("AuthShield"));
         sendSmtpEmail.setTo(Collections.singletonList(new SendSmtpEmailTo().email(toEmail).name(username)));
         sendSmtpEmail.setSubject("Email verification OTP");
-        sendSmtpEmail.textContent(msg);
+        sendSmtpEmail.setHtmlContent(msg);
 
         try{
             transactionalEmailsApi.sendTransacEmail(sendSmtpEmail);
